@@ -27,4 +27,29 @@ $\text{File Size} = \text{Sample Rate} * \text{Sample Resolution} * \text{Length
 ### PreRequisites
  - portaudio
  
+For streaming in a non-blocking manner, it is essential to use in [callback mode](https://people.csail.mit.edu/hubert/pyaudio/docs/#example-callback-mode-audio-i-o).
+
+Parameters to open PyAudio Stream,
+- format = the same as bit depth, (Default, paInt16 = 16 bit depth, good enough for music)
+- rate = Sampling rate, depends on what DeepGram is capable of processing
+- channels = 1 (assume single mic)
+- input = True, we need input stream channel
+- frames_per_buffer = A single frame is format * channels bytes large, this specifies how many frames we wish to have per buffer, aka, chunk.
+- stream_callback = callback that is called for each chunk. If this is set, do not use `read` or `write` operation.
+
+## DeepGram
+
+To use DeepGram we need to adhere to few media specifications as highlighted [here](https://developers.deepgram.com/docs/tts-media-output-settings#audio-format-combinations).
+
+The major points, we will be using Streaming API with WebSockets, that only supports 3 formats. Out of which with PyAudio we are using `linear16` Encoding scheme. This scheme only supports Sample rate of `8000`, `16000`, `24000`, `32000`, and `48000` Hz.
+
+After multiple tests, and various references, `16000` seems to be the best sample rate for audio. Any other sample rate doesn't yield as good of response.
+
+After more tests, sending wav file yielded much better response than what live streaming was capable of. 
+
+For STT, we will use PyAudio to record sound, then use a VAD to find if speech is being generated. If there is no speech detected for 3 or 4 seconds, we will then compress the wav file to only include speech sections, and then transfer this file to DeepGram to generate response.
+
+## OpenAI
+
+It has a simple REST API to send all the user messages. However, we also need to append `system message` along with it. Once we do recieve the answer, we need to send it back to OpenAI to generate TTS that can be played. It would be better to store this TTS as wav file temporarily in system somewhere. Since it will be a CLI application, we will only show the texts received and play them out together, with no possibility of replay.
 
