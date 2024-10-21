@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "vertexcover-assignment"
+version = "0.1.0"
+description = ""
+authors = ["hungerarray <ranjan.ojha01@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pyaudio = "^0.2.14"
+asyncio = "^3.4.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
