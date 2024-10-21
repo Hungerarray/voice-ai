@@ -46,6 +46,13 @@ Voice Audio Detection, by Google. It's claimed to have the best performance in t
     - Mono audio (there should be only 1 channel, currently we use only 1 channel)
     - Sample rate of, 8KHz, 16KHz, 32KHz, or 48KHz (we will use 16KHz)
     - Frames must be 10, 20, or 30ms in duration
+    
+We compute the chunk size. Considering that our frames will be of 30ms in size. In 1 second we have 16000 frames, so in 30 ms we will have, 16000 * 30 / 1000 = 480 Frames.
+Similarly, our strategy will be to look at the past 2 seconds of data. If 50% of them are marked as voiced, we start collecting them into a voiced bucket. Again, if we have more than 2 seconds of no speech while gathering then we will stop collecting and send all in the voiced bucket to inference engine.
+Since there are chunks every 30ms, there will be about 2000 / 30 chunks = 66.67 = 67 chunks.
+So our ring buffer will have maxlen of 67 chunks.
+
+[Example reference](https://github.com/wiseman/py-webrtcvad/blob/master/example.py)
 
 ## DeepGram
 

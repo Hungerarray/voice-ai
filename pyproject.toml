@@ -10,6 +10,7 @@ python = "^3.12"
 pyaudio = "^0.2.14"
 asyncio = "^3.4.3"
 webrtcvad = "^2.0.10"
+setuptools = "^75.2.0"
 
 
 [build-system]
