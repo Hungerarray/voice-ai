@@ -37,6 +37,16 @@ Parameters to open PyAudio Stream,
 - frames_per_buffer = A single frame is format * channels bytes large, this specifies how many frames we wish to have per buffer, aka, chunk.
 - stream_callback = callback that is called for each chunk. If this is set, do not use `read` or `write` operation.
 
+## WebRTCVAD
+
+Voice Audio Detection, by Google. It's claimed to have the best performance in the block.
+
+### Prerequisites
+    - 16 bit (paInt16 should work)
+    - Mono audio (there should be only 1 channel, currently we use only 1 channel)
+    - Sample rate of, 8KHz, 16KHz, 32KHz, or 48KHz (we will use 16KHz)
+    - Frames must be 10, 20, or 30ms in duration
+
 ## DeepGram
 
 To use DeepGram we need to adhere to few media specifications as highlighted [here](https://developers.deepgram.com/docs/tts-media-output-settings#audio-format-combinations).

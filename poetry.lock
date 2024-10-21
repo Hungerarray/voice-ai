@@ -36,7 +36,20 @@ files = [
 [package.extras]
 test = ["numpy"]
 
+[[package]]
+name = "webrtcvad"
+version = "2.0.10"
+description = "Python interface to the Google WebRTC Voice Activity Detector (VAD)"
+optional = false
+python-versions = "*"
+files = [
+    {file = "webrtcvad-2.0.10.tar.gz", hash = "sha256:f1bed2fb25b63fb7b1a55d64090c993c9c9167b28485ae0bcdd81cf6ede96aea"},
+]
+
+[package.extras]
+dev = ["check-manifest", "memory_profiler", "nose", "psutil", "unittest2", "zest.releaser"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "57f1e7c45c4af600ad30fe85c72d0c9bb188d459ab678603d019aa0abaaa25c4"
+content-hash = "bb0c7d2b83d3b3f7509a2c71eeb7576408aecad6389d1a0dd4d514f13cd42773"

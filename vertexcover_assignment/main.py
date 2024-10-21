@@ -8,7 +8,7 @@ audio_queue = asyncio.Queue()
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
-RATE = 24000
+RATE = 16000
 CHUNK = 8000
 
 # each time this get's called I want to store it in some wave file at temporary location
@@ -60,7 +60,6 @@ async def run():
     tasks = [asyncio.create_task(i) for i in [microphone(event), save_wav(event)]]
     await asyncio.gather(*tasks)
     
-    # adding VAD will take time, so we skip it for now
                 
 
 
