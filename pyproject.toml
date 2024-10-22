@@ -12,6 +12,7 @@ asyncio = "^3.4.3"
 webrtcvad = "^2.0.10"
 setuptools = "^75.2.0"
 deepgram-sdk = "^3.7.5"
+openai = "^1.52.0"
 
 
 [build-system]

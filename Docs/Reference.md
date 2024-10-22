@@ -1,5 +1,27 @@
 # Audio Files
 
+- [Audio Files](#audio-files)
+  - [How Audio files are recreated](#how-audio-files-are-recreated)
+  - [Terms](#terms)
+- [PyAudio](#pyaudio)
+  - [PreRequisites](#prerequisites)
+- [WebRTCVAD](#webrtcvad)
+  - [Prerequisites](#prerequisites-1)
+- [DeepGram](#deepgram)
+  - [Models](#models)
+    - [Languages supported](#languages-supported)
+  - [API Rate limits](#api-rate-limits)
+  - [Cost Economics](#cost-economics)
+  - [Alternatives](#alternatives)
+  - [Additional Considerations](#additional-considerations)
+- [OpenAI](#openai)
+  - [Models](#models-1)
+  - [Pricing](#pricing)
+  - [Rate Limits](#rate-limits)
+  - [Alternatives](#alternatives-1)
+  - [Additional Considerations](#additional-considerations-1)
+
+
 ## How Audio files are recreated
 
 We are let with a series of positive and negative voltages, that with properties such as amplitude and frequency, are able to reproduce the sound they represent. Now we introduce an Analog to Digital converter, also known as an A-D converter. This is a device that takes digital snapshots of the analog signal at a defined rate, called a Sample Rate. The most common Sample Rates are 44.1kHz and 48kHz. Each snapshot it takes, it uses strings of binary information (1s and 0s) to represent the voltages in the analog audio.
@@ -22,9 +44,9 @@ $\text{File Size} = \text{Sample Rate} * \text{Sample Resolution} * \text{Length
 
 - **Audio Channel**: Defined as the representation of sound coming from or going to a single point. An audio file mixed for headphones will use 2 channels, while the ones mixed for movie production will have 6 different audio channels. A regular setup will have a single mic, which means you can only have 1 audio input channel. While, it is possible to generate 2 channel audio, by using software, careful considerations might be needed.
 
-## PyAudio
+# PyAudio
 
-### PreRequisites
+## PreRequisites
  - portaudio
  
 For streaming in a non-blocking manner, it is essential to use in [callback mode](https://people.csail.mit.edu/hubert/pyaudio/docs/#example-callback-mode-audio-i-o).
@@ -37,11 +59,11 @@ Parameters to open PyAudio Stream,
 - frames_per_buffer = A single frame is format * channels bytes large, this specifies how many frames we wish to have per buffer, aka, chunk.
 - stream_callback = callback that is called for each chunk. If this is set, do not use `read` or `write` operation.
 
-## WebRTCVAD
+# WebRTCVAD
 
 Voice Audio Detection, by Google. It's claimed to have the best performance in the block.
 
-### Prerequisites
+## Prerequisites
     - 16 bit (paInt16 should work)
     - Mono audio (there should be only 1 channel, currently we use only 1 channel)
     - Sample rate of, 8KHz, 16KHz, 32KHz, or 48KHz (we will use 16KHz)
@@ -54,7 +76,7 @@ So our ring buffer will have maxlen of 67 chunks.
 
 [Example reference](https://github.com/wiseman/py-webrtcvad/blob/master/example.py)
 
-## DeepGram
+# DeepGram
 
 To use DeepGram we need to adhere to few media specifications as highlighted [here](https://developers.deepgram.com/docs/tts-media-output-settings#audio-format-combinations).
 
@@ -66,7 +88,7 @@ After more tests, sending wav file yielded much better response than what live s
 
 For STT, we will use PyAudio to record sound, then use a VAD to find if speech is being generated. If there is no speech detected for some time then, we will transfer this file to DeepGram to generate response.
 
-### Models
+## Models
 
 While there are multiple models to choose from, we will be using only `nova-2`.  `nova-2` also various model options to choose from,
  - `general`
@@ -83,23 +105,23 @@ While there are multiple models to choose from, we will be using only `nova-2`. 
 
 For the sake of assignment we will use, `conversationalai` version. Further details can be found [here](https://developers.deepgram.com/docs/model#nova-2)
 
-#### Languages supported
+### Languages supported
 
 Only `nova-2-general` supports multiple languages. Other enhanced model only support `en-US`.
 
-### API Rate limits
+## API Rate limits
 This is for "Pay As You Go" `nova-2` model.
 - 100 Concurrent requests
 
-### Cost Economics
+## Cost Economics
 
 At "Pay As You Go" model with `nova-2`, expected cost is, `$0.0043/min`.
 
-### Alternatives
+## Alternatives
 
 Self hosting `Whisper-large` instance.
 
-### Additional Considerations
+## Additional Considerations
 
 They also provide Text-To-Speech API. For this they have only 1 model `Aura`. The pricing is `$0.0150/1k` characters. The API limits for this model are,
     - 2000 Maximum Characters
@@ -107,7 +129,51 @@ They also provide Text-To-Speech API. For this they have only 1 model `Aura`. Th
     - 2 concurrent requests
 
 
-## OpenAI
+# OpenAI
 
 It has a simple REST API to send all the user messages. However, we also need to append `system message` along with it. Once we do recieve the answer, we need to send it back to OpenAI to generate TTS that can be played. It would be better to store this TTS as wav file temporarily in system somewhere. Since it will be a CLI application, we will only show the texts received and play them out together, with no possibility of replay.
 
+## Models
+We have the options of using GPT-3.5 or GPT-4o-mini. GPT 4o mini is considered to have better performance while being cheaper. So we pick GPT 4o mini instead.
+
+## Pricing
+
+| Model         | Pricing                |
+| ------------- | ---------------------- |
+| GPT 3.5 Turbo | $3/1M input tokens     |
+| GPT 4o mini   | $0.150/1M input tokens |
+| GPT 40        | $2.5/1M input tokens   |
+
+Further details are available [here](https://openai.com/api/pricing/).
+
+## Rate Limits
+
+Rate limits in OpenAI depend on your usage tier. For Free tier you have,
+
+
+| Model         | Requests Per Minute | Requests Per Day | Tokens Per Minute |
+| ------------- | ------------------- | ---------------- | ----------------- |
+| gpt-3.5-turbo | 3                   | 200              | 40,000            |
+| tts-1         | 3                   | 200              | -                 |
+
+The usage of API is not free, and is only possible if you have free credits provided by OpenAI which seems to have been stopped.
+
+For user who has spent $5, they are upgraded to tier 1 and have following limits,
+
+| Model         | Requests Per Minute | Requests Per Day | Tokens Per Minute |
+| ------------- | ------------------- | ---------------- | ----------------- |
+| gpt-4o        | 500                 | -                | 30,000            |
+| gpt-4o-mini   | 500                 | 10,000           | 200,000           |
+| gpt-3.5-turbo | 3,500               | 10,000           | 200,000           |
+| tts-1         | 500                 | -                | -                 |
+| tts-1-hd      | 500                 | -                | -                 |
+
+Further details can be found [here](https://platform.openai.com/docs/guides/rate-limits/tier-1-rate-limits).
+
+## Alternatives
+
+Self hosting open source llm, lama is possible using [ollama](https://ollama.com/). For TTS, we can use Deepgram. There are some other [suggestions](https://docs.google.com/document/d/1sariO32u4a87vfZDzAR-fq2RwuZ_zxBj29vMG8UFH2s/edit?tab=t.0#heading=h.y2rv92en8xpt), but require further digging.
+
+## Additional Considerations
+
+While for the current simple execution purposes we make use of OpenAI API using it's official SDK. For any complex application, the use of LangChain would be preferable.
