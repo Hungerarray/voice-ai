@@ -1,5 +1,7 @@
 import asyncio
 import collections
+import io
+import wave
 import webrtcvad
 from enum import Enum
 import math
@@ -27,9 +29,9 @@ class SpeechState(Enum):
 
 class Listener:
     def __init__(self, pa: pyaudio.PyAudio):
-        self.pa = pa
-        self.audio_queue = asyncio.Queue()
-        self.stream = None
+        self.__pa = pa
+        self. __audio_queue = asyncio.Queue()
+        self.__stream = None
 
     # each time this get's called I want to store it in some wave file at temporary location
 
@@ -39,11 +41,11 @@ class Listener:
             # this had to be done as we are using asyncio Queue, that is not thread safe
             # so we schedule it to called on the running loop thread eventually for other
             # functionalities to work
-            loop.call_soon_threadsafe(self.audio_queue.put_nowait, input_data)
+            loop.call_soon_threadsafe(self. __audio_queue.put_nowait, input_data)
             # since our stream has no output, we can send None
             return (None, pyaudio.paContinue)
 
-        self.stream = self.pa.open(
+        self.__stream = self.__pa.open(
             format=FORMAT,
             channels=CHANNELS,
             rate=RATE,
@@ -53,13 +55,13 @@ class Listener:
         )
 
     def __stop_microphone(self) -> None:
-        if self.stream is None:
+        if self.__stream is None:
             return
 
-        self.stream.stop_stream()
-        self.stream.close()
+        self.__stream.stop_stream()
+        self.__stream.close()
 
-    async def __mic_listen(self) -> bytes:
+    async def __mic_listen(self) -> io.BytesIO:
         all_mic_data = []
         speech_state = SpeechState.NOT_SPEAKING
         vad_buff = collections.deque(maxlen=VAD_BUFF_MAX_LEN)
@@ -69,7 +71,7 @@ class Listener:
         # VAD code must be set here
         # Initially we are in not speaking state
         while True:
-            mic_data = await self.audio_queue.get()
+            mic_data = await self. __audio_queue.get()
             is_speech = vad.is_speech(mic_data, RATE)
             print(f"Current state: {speech_state}")
 
@@ -90,21 +92,31 @@ class Listener:
                 if num_unvoiced >= VAD_ACTIVATION_RATE * VAD_BUFF_MAX_LEN:
                     break
 
-            self.audio_queue.task_done()
+            self. __audio_queue.task_done()
 
         self.__stop_microphone()
 
         # We terminate the "Listening" phase and discard any data after
-        while not self.audio_queue.empty():
-            self.audio_queue.get_nowait()
-            self.audio_queue.task_done()
+        while not self. __audio_queue.empty():
+            self. __audio_queue.get_nowait()
+            self. __audio_queue.task_done()
 
+        # we do this, as we need the various wav header information 
+        # for details like #channels, sample_rate, etc.
         frames = b"".join(all_mic_data)
-        return frames
+        buffer = io.BytesIO()
+        wav = wave.open(buffer, 'wb')
+        wav.setnchannels(CHANNELS)
+        wav.setsampwidth(pyaudio.get_sample_size(FORMAT))
+        wav.setframerate(RATE)
+        wav.writeframes(frames)
+        wav.close()
+        buffer.seek(0)
+        return buffer.read()
 
-    async def run(self) -> bytes:
+    async def run(self) -> io.BytesIO:
         loop = asyncio.get_running_loop()
         self.__start_microphone(loop)
         print("microphone started successfully")
-        audio = await asyncio.create_task(self.__mic_listen())
+        audio = await self.__mic_listen()
         return audio
