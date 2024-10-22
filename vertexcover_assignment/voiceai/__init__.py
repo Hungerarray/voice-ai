@@ -1,1 +1,1 @@
-from voiceai import VoiceAI
+from .voiceai import VoiceAI

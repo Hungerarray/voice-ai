@@ -27,11 +27,12 @@ class SpeechState(Enum):
     NOT_SPEAKING = 2
     SPEAKING = 1
 
-class Listener:
-    def __init__(self, pa: pyaudio.PyAudio):
+class Listener():
+    def __init__(self, pa: pyaudio.PyAudio, enable_log: bool = False):
         self.__pa = pa
         self. __audio_queue = asyncio.Queue()
         self.__stream = None
+        self.__enable_log = enable_log
 
     # each time this get's called I want to store it in some wave file at temporary location
 
@@ -66,8 +67,12 @@ class Listener:
         speech_state = SpeechState.NOT_SPEAKING
         vad_buff = collections.deque(maxlen=VAD_BUFF_MAX_LEN)
         vad = webrtcvad.Vad()
+        once = True
         # VAD code must be set here
         # Initially we are in not speaking state
+        if self.__enable_log:
+            print("====================")
+            print("Listening...")
         while True:
             mic_data = await self. __audio_queue.get()
             is_speech = vad.is_speech(mic_data, RATE)
@@ -83,6 +88,9 @@ class Listener:
                     vad_buff.clear()
             # We stop "Listening" when we have had 50% or more unvoiced frames in past 1 second
             elif speech_state == SpeechState.SPEAKING:
+                if self.__enable_log and once:
+                    print("User is now speaking")
+                    once = False
                 all_mic_data.append(mic_data)
                 vad_buff.append((mic_data, is_speech))
                 num_unvoiced = sum([1 for _, speech in vad_buff if not speech])
