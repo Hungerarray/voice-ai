@@ -5,7 +5,7 @@ from .llm import OpenAILLM
 
 
 class VoiceAI:
-    def __init__(self, deepgram_key: str, openai_key: str):
+    def __init__(self, deepgram_key: str, openai_key: str, enable_logs: bool = False):
         self.__pa = pyaudio.PyAudio()
         self.__listener = Listener(self.__pa)
         self.__tts = DeepGramSTT(deepgram_key)

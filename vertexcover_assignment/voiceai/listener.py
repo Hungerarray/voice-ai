@@ -61,13 +61,11 @@ class Listener:
         self.__stream.stop_stream()
         self.__stream.close()
 
-    async def __mic_listen(self) -> io.BytesIO:
+    async def __mic_listen(self) -> bytes:
         all_mic_data = []
         speech_state = SpeechState.NOT_SPEAKING
         vad_buff = collections.deque(maxlen=VAD_BUFF_MAX_LEN)
         vad = webrtcvad.Vad()
-        print("started listening")
-
         # VAD code must be set here
         # Initially we are in not speaking state
         while True:
@@ -113,9 +111,8 @@ class Listener:
         buffer.seek(0)
         return buffer.read()
 
-    async def listen(self) -> io.BytesIO:
+    async def listen(self) -> bytes:
         loop = asyncio.get_running_loop()
         self.__start_microphone(loop)
-        print("microphone started successfully")
         audio = await self.__mic_listen()
         return audio
