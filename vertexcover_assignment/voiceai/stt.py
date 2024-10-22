@@ -1,6 +1,5 @@
 from deepgram import DeepgramClient, PrerecordedOptions, FileSource
 
-
 class DeepGramSTT:
     def __init__(self, api_key: str):
         self.__deepgram = DeepgramClient(api_key=api_key)

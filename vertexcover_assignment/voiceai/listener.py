@@ -73,7 +73,6 @@ class Listener:
         while True:
             mic_data = await self. __audio_queue.get()
             is_speech = vad.is_speech(mic_data, RATE)
-            print(f"Current state: {speech_state}")
 
             # we don't start "Listening" until we have confirmed 50% or more of voiced frames in past 1 second
             if speech_state == SpeechState.NOT_SPEAKING:
@@ -114,7 +113,7 @@ class Listener:
         buffer.seek(0)
         return buffer.read()
 
-    async def run(self) -> io.BytesIO:
+    async def listen(self) -> io.BytesIO:
         loop = asyncio.get_running_loop()
         self.__start_microphone(loop)
         print("microphone started successfully")
