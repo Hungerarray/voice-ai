@@ -1,0 +1,2 @@
+export DEEPGRAM_API_KEY=your-datagram-key-here
+export OPENAI_API_KEY=your-openai-key-here

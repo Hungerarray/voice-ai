@@ -1,22 +1,18 @@
 import asyncio
-import json
 import sys
 import os
-import tempfile
-import time
-
-import pyaudio
 
 from voiceai import VoiceAI
+from dotenv import load_dotenv
 
 def main():
     deepgram_key = os.getenv('DEEPGRAM_API_KEY')
     openai_key = os.getenv('OPENAI_API_KEY')
     
-    if deepgram_key == "":
+    if deepgram_key == "" or deepgram_key == "your-datagram-key-here":
         print("Deepgram API key not found")
         sys.exit(-1)
-    if openai_key == "":
+    if openai_key == "" or openai_key == "your-openai-key-here":
         print("OpenAI API Key not found")
         sys.exit(-1)
 
@@ -24,4 +20,5 @@ def main():
     asyncio.run(voiceai.run())
 
 if __name__ == "__main__":
+    load_dotenv()
     main()
