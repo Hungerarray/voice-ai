@@ -64,7 +64,48 @@ After multiple tests, and various references, `16000` seems to be the best sampl
 
 After more tests, sending wav file yielded much better response than what live streaming was capable of. 
 
-For STT, we will use PyAudio to record sound, then use a VAD to find if speech is being generated. If there is no speech detected for 3 or 4 seconds, we will then compress the wav file to only include speech sections, and then transfer this file to DeepGram to generate response.
+For STT, we will use PyAudio to record sound, then use a VAD to find if speech is being generated. If there is no speech detected for some time then, we will transfer this file to DeepGram to generate response.
+
+### Models
+
+While there are multiple models to choose from, we will be using only `nova-2`.  `nova-2` also various model options to choose from,
+ - `general`
+ - `meeting`
+ - `phonecall`
+ - `voicemail`
+ - `finance`
+ - `conversationalai` 
+ - `video`
+ - `medical`
+ - `drivethru`
+ - `automotive`
+ - `atc`
+
+For the sake of assignment we will use, `conversationalai` version. Further details can be found [here](https://developers.deepgram.com/docs/model#nova-2)
+
+#### Languages supported
+
+Only `nova-2-general` supports multiple languages. Other enhanced model only support `en-US`.
+
+### API Rate limits
+This is for "Pay As You Go" `nova-2` model.
+- 100 Concurrent requests
+
+### Cost Economics
+
+At "Pay As You Go" model with `nova-2`, expected cost is, `$0.0043/min`.
+
+### Alternatives
+
+Self hosting `Whisper-large` instance.
+
+### Additional Considerations
+
+They also provide Text-To-Speech API. For this they have only 1 model `Aura`. The pricing is `$0.0150/1k` characters. The API limits for this model are,
+    - 2000 Maximum Characters
+    - 480 Requests Per minute
+    - 2 concurrent requests
+
 
 ## OpenAI
 
