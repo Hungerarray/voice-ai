@@ -14,7 +14,11 @@ class VoiceAI:
         self.__enable_logs = enable_logs
 
     async def run(self):
-        print('Hello, I am your assistant. To exit say "goodbye"') 
+        message = 'Hello, I am your assistant. To exit say "goodbye"'
+        print("====================")
+        print(message)
+        print("====================")
+        self.__llm.speak(message)
 
         while True:
             print("\n\n")
