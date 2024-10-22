@@ -7,8 +7,12 @@ from enum import Enum
 import math
 import pyaudio
 
-# audio_queue = asyncio.Queue()
 
+# !Warning
+# These constants were determined after various testing phase
+# as such are known combination to work. 
+# While they can be exposed to user, changing them could lead to
+# noticable degradation of quality
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000
