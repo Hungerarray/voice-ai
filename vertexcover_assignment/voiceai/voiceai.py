@@ -10,7 +10,7 @@ class VoiceAI:
         self.__pa = pyaudio.PyAudio()
         self.__listener = Listener(self.__pa, enable_log=enable_logs)
         self.__tts = DeepGramSTT(deepgram_key)
-        self.__llm = OpenAILLM(openai_key, self.__pa)
+        self.__llm = OpenAILLM(openai_key, self.__pa, system_message="You are a conversational AI chat bot. Please keep your messages succinct and enable people well in converstaions.")
         self.__enable_logs = enable_logs
 
     async def run(self):
@@ -57,5 +57,6 @@ class VoiceAI:
                 print(f"Total conversation Time: {total_time_taken - audio_received_time} seconds")
                 print("====================")
             
-            if 'goodbye' in message.lower():
+            # check if goodbye is the final word in the sentence
+            if 'goodbye' in message.lower().split()[-1]:
                 break
